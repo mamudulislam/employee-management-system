@@ -56,7 +56,7 @@ export const apiRequest = async <T = any>(
     const data = await response.json();
     return {
       success: true,
-      data: data.data || data,
+      data: data,
     };
   } catch (error: any) {
     clearTimeout(timeoutId);

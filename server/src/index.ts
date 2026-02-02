@@ -19,8 +19,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // Frontend URLs
-  credentials: true
+    origin: ['http://localhost:3000', 'http://localhost:5173'], // Frontend URLs
+    credentials: true
 }));
 app.use(express.json());
 
@@ -44,7 +44,6 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
-app.listen(Number(PORT), '127.0.0.1', () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
-

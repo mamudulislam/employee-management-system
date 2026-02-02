@@ -5,36 +5,33 @@ import Leave from '../models/Leave';
 export const getLeaves = async (req: Request, res: Response) => {
     try {
         const leaves = await Leave.find()
-            .populate('employee', 'name department designation employeeId')
+            .populate('employee', 'name email department designation employeeId')
             .sort({ appliedDate: -1 });
-        
-        // Debug: Check if Employee collection exists and has data
-        const Employee = require('../models/Employee').default;
-        const employeeCount = await Employee.countDocuments();
-        console.log('Employee count:', employeeCount);
-        
-        // Debug: Check raw leave documents
-        const rawLeaves = await Leave.find().lean();
-        console.log('Raw leaves employee refs:', rawLeaves.map(l => ({
-            id: l._id,
-            employee: l.employee
-        })));
-        
-        console.log('Populated leaves:', leaves.map(l => ({ 
-            id: l._id, 
-            employeeId: l.employee,
-            employeeName: (l.employee as any)?.name || 'NULL'
-        })));
-        
+
+        // Handle cases where employee record might have been deleted but leave remains
+        const processedLeaves = leaves.map(leave => {
+            const leaveObj = leave.toObject();
+            if (!leaveObj.employee) {
+                // If population failed (employee deleted), use a placeholder
+                // We can't easily get the ID back from a null population result in Mongoose 
+                // unless we used .lean() or looked at the raw document
+                return {
+                    ...leaveObj,
+                    employee: { name: 'Former Employee', department: 'Unknown', isDeleted: true }
+                };
+            }
+            return leaveObj;
+        });
+
         res.json({
             success: true,
-            data: leaves
+            data: processedLeaves
         });
     } catch (err: any) {
         console.error('Get leaves error:', err);
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            message: err.message 
+            message: err.message
         });
     }
 };
@@ -43,14 +40,14 @@ export const requestLeave = async (req: Request, res: Response) => {
     try {
         // Extract employeeName but don't store it in the database
         const { employeeName, ...leaveData } = req.body;
-        
+
         // If the employee field is a User ID, we need to find the corresponding Employee
         let employeeRef = leaveData.employee;
-        
+
         // Check if the employee reference exists in Employee collection
         const Employee = require('../models/Employee').default;
         const employee = await Employee.findById(employeeRef);
-        
+
         // If not found as Employee, try to find Employee by email using User info
         if (!employee) {
             const User = require('../models/User').default;
@@ -70,10 +67,10 @@ export const requestLeave = async (req: Request, res: Response) => {
                         phone: 'Not provided',
                         address: 'Not provided',
                         department: user.department || 'General',
-                        designation: user.role === 'HR_ADMIN' ? 'HR Administrator' : 
-                                     user.role === 'MANAGER' ? 'Manager' : 'Employee',
-                        role: user.role === 'HR_ADMIN' ? 'HR' : 
-                              user.role === 'MANAGER' ? 'Manager' : 'Employee',
+                        designation: user.role === 'HR_ADMIN' ? 'HR Administrator' :
+                            user.role === 'MANAGER' ? 'Manager' : 'Employee',
+                        role: user.role === 'HR_ADMIN' ? 'HR' :
+                            user.role === 'MANAGER' ? 'Manager' : 'Employee',
                         dateOfJoining: new Date(),
                         status: 'Active',
                         emergencyContact: {
@@ -93,19 +90,19 @@ export const requestLeave = async (req: Request, res: Response) => {
                 }
             }
         }
-        
+
         const leave = await Leave.create({ ...leaveData, employee: employeeRef });
         const populatedLeave = await Leave.findById(leave._id)
             .populate('employee', 'name department designation employeeId');
-            
+
         res.status(201).json({
             success: true,
             data: populatedLeave
         });
     } catch (err: any) {
-        res.status(400).json({ 
+        res.status(400).json({
             success: false,
-            message: err.message 
+            message: err.message
         });
     }
 };

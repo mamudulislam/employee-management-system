@@ -72,3 +72,17 @@ export const deleteEmployee = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+// @desc   Delete multiple employees
+export const deleteBulkEmployees = async (req: Request, res: Response) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ message: 'Please provide an array of employee IDs' });
+        }
+        await Employee.deleteMany({ _id: { $in: ids } });
+        res.json({ message: 'Employees removed successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

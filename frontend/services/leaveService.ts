@@ -14,6 +14,7 @@ export interface Leave {
   employee: {
     _id: string;
     name: string;
+    email: string;
     department: string;
     designation: string;
     employeeId: string;
@@ -35,7 +36,7 @@ export class LeaveService {
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch leaves');
       }
-      return response.data || [];
+      return (response.data as any)?.data || response.data || [];
     } catch (error) {
       console.error('Get leaves failed:', error);
       throw error;
@@ -48,7 +49,7 @@ export class LeaveService {
       if (!response.success) {
         throw new Error(response.error || 'Failed to request leave');
       }
-      return response.data!;
+      return (response.data as any)?.data || response.data;
     } catch (error) {
       console.error('Leave request failed:', error);
       throw error;
@@ -56,8 +57,8 @@ export class LeaveService {
   }
 
   static async updateLeaveStatus(
-    leaveId: string, 
-    status: 'Approved' | 'Rejected' | 'Cancelled', 
+    leaveId: string,
+    status: 'Approved' | 'Rejected' | 'Cancelled',
     remarks?: string,
     token?: string
   ): Promise<Leave> {
@@ -69,7 +70,7 @@ export class LeaveService {
       if (!response.success) {
         throw new Error(response.error || 'Failed to update leave status');
       }
-      return response.data!;
+      return (response.data as any)?.data || response.data;
     } catch (error) {
       console.error('Update leave status failed:', error);
       throw error;
@@ -82,7 +83,7 @@ export class LeaveService {
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch employee leaves');
       }
-      return response.data || [];
+      return (response.data as any)?.data || response.data || [];
     } catch (error) {
       console.error('Get employee leaves failed:', error);
       throw error;

@@ -45,15 +45,15 @@ export class EmployeeService {
   }): Promise<EmployeeResponse> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.limit) queryParams.append('limit', params.limit.toString());
       if (params?.search) queryParams.append('search', params.search);
       if (params?.department) queryParams.append('department', params.department);
-      
+
       const url = `/employees${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await apiGet<EmployeeResponse>(url, AuthService.getToken() || undefined);
-      
+
       if (response.success && response.data) {
         // Transform backend employee data to frontend format
         const employeeData = response.data.data || response.data;
@@ -68,7 +68,7 @@ export class EmployeeService {
           status: emp.status,
           avatar: emp.profilePicture || ''
         }));
-        
+
         return {
           data: transformedEmployees,
           total: response.data.total,
@@ -76,7 +76,7 @@ export class EmployeeService {
           limit: response.data.limit
         };
       }
-      
+
       throw new Error(response.error || 'Failed to fetch employees');
     } catch (error) {
       console.error('Get employees failed:', error);
@@ -87,7 +87,7 @@ export class EmployeeService {
   static async getEmployee(id: string): Promise<Employee> {
     try {
       const response = await apiGet(`/employees/${id}`, AuthService.getToken() || undefined);
-      
+
       if (response.success && response.data) {
         const emp = response.data;
         return {
@@ -102,7 +102,7 @@ export class EmployeeService {
           avatar: emp.profilePicture || ''
         };
       }
-      
+
       throw new Error(response.error || 'Failed to fetch employee');
     } catch (error) {
       console.error('Get employee failed:', error);
@@ -113,7 +113,7 @@ export class EmployeeService {
   static async createEmployee(employeeData: EmployeeFormData): Promise<Employee> {
     try {
       const response = await apiPost('/employees', employeeData, AuthService.getToken() || undefined);
-      
+
       if (response.success && response.data) {
         const emp = response.data;
         return {
@@ -128,7 +128,7 @@ export class EmployeeService {
           avatar: emp.profilePicture || ''
         };
       }
-      
+
       throw new Error(response.error || 'Failed to create employee');
     } catch (error) {
       console.error('Create employee failed:', error);
@@ -139,7 +139,7 @@ export class EmployeeService {
   static async updateEmployee(id: string, employeeData: Partial<EmployeeFormData>): Promise<Employee> {
     try {
       const response = await apiPut(`/employees/${id}`, employeeData, AuthService.getToken() || undefined);
-      
+
       if (response.success && response.data) {
         const emp = response.data;
         return {
@@ -154,7 +154,7 @@ export class EmployeeService {
           avatar: emp.profilePicture || ''
         };
       }
-      
+
       throw new Error(response.error || 'Failed to update employee');
     } catch (error) {
       console.error('Update employee failed:', error);
@@ -162,10 +162,23 @@ export class EmployeeService {
     }
   }
 
+  static async deleteBulkEmployees(ids: string[]): Promise<void> {
+    try {
+      const response = await apiPost('/employees/bulk-delete', { ids }, AuthService.getToken() || undefined);
+
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete employees');
+      }
+    } catch (error) {
+      console.error('Bulk delete employees failed:', error);
+      throw error;
+    }
+  }
+
   static async deleteEmployee(id: string): Promise<void> {
     try {
       const response = await apiDelete(`/employees/${id}`, AuthService.getToken() || undefined);
-      
+
       if (!response.success) {
         throw new Error(response.error || 'Failed to delete employee');
       }
