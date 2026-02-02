@@ -69,7 +69,7 @@ const EmployeeDirectory: React.FC = () => {
     return filteredEmployees;
   }, [filteredEmployees]);
 
-  const totalPages = Math.ceil(totalEmployees / itemsPerPage);
+  const totalPages = Math.ceil((totalEmployees || 0) / itemsPerPage);
 
   const toggleEmployee = (empId: string) => {
     setSelectedEmployees(prev => {
@@ -98,6 +98,69 @@ const EmployeeDirectory: React.FC = () => {
     });
   };
 
+  const selectAllEmployees = async () => {
+    try {
+      const response = await EmployeeService.getEmployees({
+        page: 1,
+        limit: 10000
+      });
+      
+      const allEmployeeIds = response.data.map(emp => emp.id);
+      setSelectedEmployees(new Set(allEmployeeIds));
+      showToast.success(`Selected ${allEmployeeIds.length} employees`);
+    } catch (error) {
+      console.error('Select all failed:', error);
+      showToast.error('Failed to select all employees');
+    }
+  };
+
+  const clearAllSelections = () => {
+    setSelectedEmployees(new Set());
+    showToast.success('Selection cleared');
+  };
+
+  const exportEmployees = async (selectedOnly = false) => {
+    try {
+      let dataToExport = employees;
+      
+      if (selectedOnly && selectedEmployees.size > 0) {
+        dataToExport = employees.filter(emp => selectedEmployees.has(emp.id));
+      }
+      
+      // Create CSV content
+      const headers = ['ID', 'Name', 'Email', 'Department', 'Role', 'Join Date', 'Salary', 'Status'];
+      const csvContent = [
+        headers.join(','),
+        ...dataToExport.map(emp => [
+          emp.id,
+          `"${emp.name}"`,
+          emp.email,
+          emp.department,
+          emp.role,
+          new Date(emp.joinDate).toLocaleDateString(),
+          emp.salary,
+          emp.status
+        ].join(','))
+      ].join('\n');
+      
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `employees_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      showToast.success(`${selectedOnly ? 'Selected' : 'All'} employees exported successfully`);
+    } catch (error) {
+      console.error('Export failed:', error);
+      showToast.error('Failed to export employees');
+    }
+  };
+
   return (
     <Card className="border-none shadow-sm bg-white dark:bg-slate-900 overflow-hidden">
       {/* Bulk Actions Bar */}
@@ -109,18 +172,32 @@ const EmployeeDirectory: React.FC = () => {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-2 rounded-xl bg-white dark:bg-slate-900"
+              onClick={selectAllEmployees}
+            >
+              <UsersIcon size={16} />
+              <span className="hidden sm:inline">Select All</span>
+            </Button>
             <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl bg-white dark:bg-slate-900">
               <Mail size={16} />
               <span className="hidden sm:inline">Send Email</span>
             </Button>
-            <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl bg-white dark:bg-slate-900">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-2 rounded-xl bg-white dark:bg-slate-900"
+              onClick={() => exportEmployees(true)}
+            >
               <FileDown size={16} />
               <span className="hidden sm:inline">Export</span>
             </Button>
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => setSelectedEmployees(new Set())}
+              onClick={clearAllSelections}
               className="h-9 gap-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border-none"
             >
               <Trash2 size={16} />
@@ -140,7 +217,7 @@ const EmployeeDirectory: React.FC = () => {
             Employee Directory
           </CardTitle>
           <p className="text-sm text-slate-500 mt-1">
-            {loading ? 'Loading...' : `Managing ${totalEmployees.toLocaleString()} total staff members`}
+            {loading ? 'Loading...' : `Managing ${(totalEmployees || 0).toLocaleString()} total staff members`}
           </p>
           {error && (
             <p className="text-sm text-red-500 mt-1">{error}</p>
@@ -150,7 +227,13 @@ const EmployeeDirectory: React.FC = () => {
           <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-none transition-all">
             <Upload size={18} className="text-slate-500" />
           </Button>
-          <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-none transition-all">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-none transition-all"
+            onClick={() => exportEmployees(false)}
+            title="Export all employees"
+          >
             <FileDown size={18} className="text-slate-500" />
           </Button>
           <Button 
@@ -354,7 +437,7 @@ const EmployeeDirectory: React.FC = () => {
         {/* Pagination */}
         <div className="mt-8 flex items-center justify-between">
           <p className="text-sm text-slate-500 font-medium">
-            Showing <span className="font-bold text-slate-900 dark:text-slate-100">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-bold text-slate-900 dark:text-slate-100">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of {filteredEmployees.length} employees
+            Showing <span className="font-bold text-slate-900 dark:text-slate-100">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-bold text-slate-900 dark:text-slate-100">{Math.min(currentPage * itemsPerPage, filteredEmployees.length || 0)}</span> of {filteredEmployees.length || 0} employees
           </p>
           <div className="flex items-center space-x-2">
             <Button
@@ -366,7 +449,7 @@ const EmployeeDirectory: React.FC = () => {
               Previous
             </Button>
             <div className="flex items-center space-x-1">
-              {[...Array(Math.min(5, totalPages))].map((_, i) => (
+              {[...Array(Math.min(5, Math.max(0, totalPages)))].map((_, i) => (
                 <Button
                   key={i}
                   variant={currentPage === i + 1 ? 'default' : 'ghost'}

@@ -56,7 +56,8 @@ export class EmployeeService {
       
       if (response.success && response.data) {
         // Transform backend employee data to frontend format
-        const transformedEmployees = response.data.data.map((emp: any) => ({
+        const employeeData = response.data.data || response.data;
+        const transformedEmployees = (Array.isArray(employeeData) ? employeeData : []).map((emp: any) => ({
           id: emp._id,
           name: emp.name,
           email: emp.email,
