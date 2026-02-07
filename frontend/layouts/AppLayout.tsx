@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { Bell, Search, ChevronDown, Moon, Sun, Settings } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { User } from '../types';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';

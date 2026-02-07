@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Filter, X, ChevronDown } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface FilterOption {
   id: string;
@@ -11,6 +12,8 @@ interface FilterOption {
 
 const AdvancedFiltering: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [filters, setFilters] = useState<FilterOption[]>([
     {
       id: 'department',
@@ -67,8 +70,8 @@ const AdvancedFiltering: React.FC = () => {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
           isOpen
-            ? 'bg-indigo-50 border-indigo-300 text-indigo-700 shadow-md'
-            : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300'
+            ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300 shadow-md'
+            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-600'
         }`}
       >
         <Filter size={18} />
@@ -83,13 +86,13 @@ const AdvancedFiltering: React.FC = () => {
 
       {/* Filter Dropdown Panel */}
       {isOpen && (
-        <div className="absolute top-full mt-2 right-0 w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
+<div className="absolute top-full mt-2 right-0 w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-800">Advanced Filters</h3>
+              <h3 className="font-bold text-slate-800 dark:text-slate-200">Advanced Filters</h3>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <X size={18} />
               </button>
@@ -98,7 +101,7 @@ const AdvancedFiltering: React.FC = () => {
             <div className="space-y-6">
               {filters.map((filter) => (
                 <div key={filter.id} className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block">
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
                     {filter.label}
                   </label>
 
@@ -106,7 +109,7 @@ const AdvancedFiltering: React.FC = () => {
                     <select
                       value={filter.value as string}
                       onChange={(e) => updateFilter(filter.id, e.target.value)}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+                      className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-sm"
                     >
                       <option value="">All</option>
                       {filter.options?.map((opt) => (
@@ -120,7 +123,7 @@ const AdvancedFiltering: React.FC = () => {
                   {filter.type === 'multi-select' && (
                     <div className="space-y-2">
                       {filter.options?.map((opt) => (
-                        <label key={opt.value} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors">
+                        <label key={opt.value} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors">
                           <input
                             type="checkbox"
                             checked={(filter.value as string[]).includes(opt.value)}
@@ -134,7 +137,7 @@ const AdvancedFiltering: React.FC = () => {
                             }}
                             className="w-4 h-4 rounded cursor-pointer"
                           />
-                          <span className="text-sm font-medium text-slate-700">{opt.label}</span>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{opt.label}</span>
                         </label>
                       ))}
                     </div>
@@ -151,7 +154,7 @@ const AdvancedFiltering: React.FC = () => {
                             start: e.target.value,
                           })
                         }
-                        className="p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+                        className="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-sm"
                       />
                       <input
                         type="date"
@@ -162,7 +165,7 @@ const AdvancedFiltering: React.FC = () => {
                             end: e.target.value,
                           })
                         }
-                        className="p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+                        className="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition-all text-sm"
                       />
                     </div>
                   )}
@@ -172,13 +175,13 @@ const AdvancedFiltering: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="p-4 bg-slate-50 flex gap-3 border-t border-slate-100">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800 flex gap-3 border-t border-slate-100 dark:border-slate-700">
             <button
               onClick={() => {
                 clearFilters();
                 setIsOpen(false);
               }}
-              className="flex-1 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
+              className="flex-1 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
             >
               Clear All
             </button>

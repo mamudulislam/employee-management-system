@@ -6,6 +6,7 @@ import {
   BarChart, Bar, Legend
 } from 'recharts';
 import AdvancedFiltering from './AdvancedFiltering';
+import { useTheme } from '../contexts/ThemeContext';
 
 const data = [
   { month: 'Jan', headcount: 95000, revenue: 400 },
@@ -17,16 +18,31 @@ const data = [
 ];
 
 const Reports: React.FC = () => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const tooltipStyles = {
+    borderRadius: '12px',
+    border: 'none',
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+    backgroundColor: isDark ? '#1e293b' : '#ffffff',
+    color: isDark ? '#f1f5f9' : '#1e293b',
+    fontSize: '12px'
+  };
+
+  const gridColor = isDark ? '#334155' : '#f1f5f9';
+  const tickColor = isDark ? '#94a3b8' : '#64748b';
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Advanced Analytics</h2>
-          <p className="text-sm text-slate-500">In-depth insights into enterprise workforce metrics.</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Advanced Analytics</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">In-depth insights into enterprise workforce metrics.</p>
         </div>
         <div className="flex gap-2">
           <AdvancedFiltering />
-          <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-500">
+          <button className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400">
             <Share2 size={18} />
           </button>
           <button className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-indigo-700">
@@ -37,8 +53,8 @@ const Reports: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
             <LineChartIcon size={20} className="text-indigo-500" />
             <span>Growth & Scalability Trend</span>
           </h3>
@@ -51,28 +67,28 @@ const Reports: React.FC = () => {
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: tickColor}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: tickColor}} />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Area type="monotone" dataKey="headcount" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorHead)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
             <BarChart3 size={20} className="text-emerald-500" />
             <span>Turnover vs Hiring Rate</span>
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: tickColor}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: tickColor}} />
+                <Tooltip contentStyle={tooltipStyles} />
                 <Legend />
                 <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} name="Hiring Velocity" />
               </BarChart>

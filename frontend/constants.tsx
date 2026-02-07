@@ -3,6 +3,7 @@ import React from 'react';
 import {
   Users,
   LayoutDashboard,
+  LayoutGrid,
   CreditCard,
   Calendar,
   BarChart3,
@@ -32,15 +33,14 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'employees', label: 'Directory', icon: <Users size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER] },
+  { id: 'workspace', label: 'Workspace', icon: <LayoutGrid size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'org-chart', label: 'Organization', icon: <GitBranch size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER] },
   { id: 'attendance', label: 'Attendance', icon: <Calendar size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'leaves', label: 'Leaves', icon: <ShieldCheck size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'payroll', label: 'Payroll', icon: <CreditCard size={20} />, roles: [Role.HR_ADMIN, Role.EMPLOYEE] },
   { id: 'performance', label: 'Performance', icon: <TrendingUp size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'recruitment', label: 'Recruitment', icon: <UserPlus size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER] },
-  { id: 'training', label: 'Training', icon: <BookOpen size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
-  { id: 'assets', label: 'Assets', icon: <Briefcase size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER] },
-  { id: 'exit', label: 'Exit/Offboard', icon: <UserMinus size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER] },
+
   { id: 'projects', label: 'Projects', icon: <GitBranch size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
   { id: 'reports', label: 'Reports', icon: <BarChart3 size={20} />, roles: [Role.HR_ADMIN] },
   { id: 'settings', label: 'Settings', icon: <Settings size={20} />, roles: [Role.HR_ADMIN, Role.MANAGER, Role.EMPLOYEE] },
